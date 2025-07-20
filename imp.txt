@@ -1,0 +1,417 @@
+# Hostel Dalali Backend API
+
+A comprehensive Node.js/Express.js backend for the Hostel Dalali platform - MNIT's room exchange application.
+
+## 🚀 Features
+
+- **User Authentication**: JWT-based authentication with secure HTTP-only cookies
+- **Room Listings**: Create, update, and browse room exchange listings
+- **Attendance Tracking**: Track course attendance with detailed statistics
+- **CGPA Calculator**: Calculate and predict CGPA with semester management
+- **User Management**: Complete profile management and user search
+- **Interest System**: Express interest in room listings
+- **Secure API**: Input validation, rate limiting, and security headers
+
+## 🛠️ Technology Stack
+
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **Database**: MongoDB with Mongoose ODM
+- **Authentication**: JWT (jsonwebtoken) + bcrypt for password hashing
+- **Validation**: Zod for request validation
+- **Security**: Helmet, CORS, Rate limiting
+- **Environment**: dotenv for configuration
+
+## 📁 Project Structure
+
+```
+server/
+├── app.js                 # Main application file
+├── package.json           # Dependencies and scripts
+├── .env.example          # Environment variables template
+├── models/               # Mongoose models
+│   ├── User.js
+│   ├── RoomListing.js
+│   ├── Course.js
+│   └── CgpaData.js
+├── routes/               # API route handlers
+│   ├── auth.js
+│   ├── user.js
+│   ├── listings.js
+│   ├── attendance.js
+│   └── cgpa.js
+├── middleware/           # Custom middleware
+│   ├── auth.js
+│   └── errorHandler.js
+└── utils/                # Utility functions
+    └── validation.js
+```
+
+## 🚦 Getting Started
+
+### Prerequisites
+
+- Node.js (v14+ recommended)
+- MongoDB (v4.4+ recommended)
+- npm or yarn
+
+### Installation
+
+1. **Clone the repository:**
+```bash
+git clone <repository-url>
+cd server
+```
+
+2. **Install dependencies:**
+```bash
+npm install
+```
+
+3. **Set up environment variables:**
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with your configuration:
+```env
+PORT=5000
+NODE_ENV=development
+MONGODB_URI=mongodb://localhost:27017/hostel-dalali
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+JWT_EXPIRES_IN=7d
+FRONTEND_URL=http://localhost:3000
+```
+
+4. **Start MongoDB:**
+Make sure MongoDB is running on your system.
+
+5. **Run the application:**
+```bash
+# Development mode (with nodemon)
+npm run dev
+
+# Production mode
+npm start
+```
+
+The server will start on `http://localhost:5000` (or your configured PORT).
+
+## 📚 API Documentation
+
+### Authentication Endpoints
+
+#### Register User
+```http
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "email": "2024umt1920@mnit.ac.in",
+  "password": "securepassword",
+  "fullName": "John Doe",
+  "gender": "Male",
+  "whatsappNumber": "+919876543210"
+}
+```
+
+#### Login User
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "2024umt1920@mnit.ac.in",
+  "password": "securepassword"
+}
+```
+
+#### Logout User
+```http
+POST /api/auth/logout
+```
+
+#### Verify Token
+```http
+GET /api/auth/verify
+```
+
+### User Management Endpoints
+
+#### Get Current User Profile
+```http
+GET /api/user/me
+Authorization: Bearer <token> (via cookie)
+```
+
+#### Update User Profile
+```http
+PATCH /api/user/me
+Content-Type: application/json
+
+{
+  "fullName": "Updated Name",
+  "whatsappNumber": "+919876543210",
+  "currentRoom": {
+    "hostel": "HL-1",
+    "block": "A",
+    "roomNumber": "101",
+    "type": "Single"
+  }
+}
+```
+
+### Room Listings Endpoints
+
+#### Get All Listings
+```http
+GET /api/listings?page=1&limit=20&status=Open&listingType=Exchange
+```
+
+#### Create/Update Listing
+```http
+POST /api/listings
+Content-Type: application/json
+
+{
+  "roomDetails": {
+    "hostel": "HL-1",
+    "roomNumber": "A-101",
+    "type": "Single"
+  },
+  "listingType": "Exchange",
+  "description": "Well-ventilated room with good view",
+  "desiredTradeConditions": "Looking for a room in H1-Parijat"
+}
+```
+
+#### Delist Room
+```http
+PATCH /api/listings/:id/delist
+```
+
+#### Express Interest
+```http
+POST /api/listings/:id/interest
+```
+
+### Attendance Tracking Endpoints
+
+#### Get All Courses
+```http
+GET /api/attendance/courses
+```
+
+#### Create Course
+```http
+POST /api/attendance/courses
+Content-Type: application/json
+
+{
+  "name": "Data Structures",
+  "color": "#3B82F6"
+}
+```
+
+#### Mark Attendance
+```http
+POST /api/attendance/courses/:id/mark
+Content-Type: application/json
+
+{
+  "date": "2024-01-15",
+  "status": "attended"
+}
+```
+
+#### Get Attendance Stats
+```http
+GET /api/attendance/stats
+```
+
+### CGPA Calculator Endpoints
+
+#### Get CGPA Data
+```http
+GET /api/cgpa
+```
+
+#### Save CGPA Data
+```http
+POST /api/cgpa
+Content-Type: application/json
+
+{
+  "semesters": [
+    {
+      "id": "sem1",
+      "sgpa": "8.5",
+      "credits": "24"
+    },
+    {
+      "id": "sem2",
+      "sgpa": "9.0",
+      "credits": "22"
+    }
+  ]
+}
+```
+
+#### Calculate CGPA (without saving)
+```http
+POST /api/cgpa/calculate
+Content-Type: application/json
+
+{
+  "semesters": [
+    {
+      "id": "sem1",
+      "sgpa": "8.5",
+      "credits": "24"
+    }
+  ]
+}
+```
+
+#### Predict Future CGPA
+```http
+POST /api/cgpa/predict
+Content-Type: application/json
+
+{
+  "futureSemesters": [
+    {
+      "sgpa": "9.5",
+      "credits": "22"
+    }
+  ]
+}
+```
+
+## 🔒 Security Features
+
+- **Password Hashing**: bcrypt with 12 salt rounds
+- **JWT Authentication**: Secure HTTP-only cookies
+- **Input Validation**: Zod schemas for all endpoints
+- **Rate Limiting**: 100 requests per 15 minutes per IP
+- **CORS Protection**: Configured for frontend domain
+- **Security Headers**: Helmet.js for security headers
+- **Email Validation**: MNIT email format enforcement
+
+## 🗄️ Database Models
+
+### User Model
+- Email (MNIT format required)
+- Password (hashed)
+- Full name, roll number, gender
+- Current room details
+- Exchange preferences
+- WhatsApp number for contact
+
+### Room Listing Model
+- Room details (hostel, block, room number, type)
+- Listing type (Exchange/Bidding)
+- Description and trade conditions
+- Status (Open/Closed)
+- Interest tracking
+
+### Course Model (Attendance)
+- Course name and color
+- Attended days array
+- Missed days array
+- User association
+
+### CGPA Data Model
+- Semesters array with SGPA and credits
+- Auto-calculated CGPA
+- Total credits tracking
+
+## ⚠️ Important Business Logic
+
+### Email Processing
+- Extracts roll number from email (e.g., `2024umt1920` from `2024umt1920@mnit.ac.in`)
+- Validates MNIT email format: `/^20\d{2}u[a-z]{2,3}\d{4}@mnit\.ac\.in$/i`
+
+### Room Number Parsing
+- Parses "A-101" format into block: "A", roomNumber: "101"
+- Handles various formats gracefully
+
+### Interest System
+- Users can express/remove interest in bidding listings
+- Interest count is automatically maintained
+- Users cannot express interest in their own listings
+
+## 🔧 Development Scripts
+
+```bash
+npm run dev      # Start with nodemon (development)
+npm start        # Start normally (production)
+```
+
+## 🌐 CORS Configuration
+
+The API is configured to accept requests from:
+- `http://localhost:3000` (default frontend)
+- Environment variable `FRONTEND_URL`
+
+## 📈 Error Handling
+
+All API errors return a consistent format:
+```json
+{
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human-readable error message"
+  }
+}
+```
+
+Common error codes:
+- `VALIDATION_ERROR`: Input validation failed
+- `UNAUTHENTICATED`: Authentication required/failed
+- `USER_EXISTS`: Duplicate user registration
+- `LISTING_NOT_FOUND`: Room listing not found
+- `COURSE_NOT_FOUND`: Course not found
+- `SERVER_ERROR`: Internal server error
+
+## 🚀 Deployment
+
+### Environment Variables for Production
+```env
+NODE_ENV=production
+PORT=5000
+MONGODB_URI=mongodb://your-production-db-url
+JWT_SECRET=your-very-long-and-secure-secret-key
+FRONTEND_URL=https://your-frontend-domain.com
+```
+
+### Recommended Hosting
+- **Backend**: Heroku, Railway, DigitalOcean
+- **Database**: MongoDB Atlas, DigitalOcean Managed Databases
+- **Environment**: Node.js 16+ recommended
+
+## 🤝 Frontend Integration
+
+This backend is designed to work seamlessly with the provided React frontend. Key integration points:
+
+1. **Authentication**: Uses HTTP-only cookies for security
+2. **Data Formats**: All responses match TypeScript interfaces in `types.ts`
+3. **User Experience**: Supports all frontend features including:
+   - Room listing with interest system
+   - Attendance tracking with visual calendar
+   - CGPA calculation with prediction
+   - Real-time user search
+
+## 📞 Support
+
+For issues or questions:
+1. Check the API documentation above
+2. Verify environment variables are set correctly
+3. Ensure MongoDB is running and accessible
+4. Check server logs for detailed error messages
+
+## 📄 License
+
+
+This project is licensed under the ISC License.
+#
